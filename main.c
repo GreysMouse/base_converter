@@ -51,7 +51,11 @@ int main(int argc, const char **argv)
     };
 
     res = buf + src_len;
-    res_len = convert(buf, res);
+    res_len = convert(buf, src_len);
+
+    if (res_len < 0) {
+        goto cleanup;
+    }
 
     if (fwrite(res, sizeof(char), res_len, dest) != res_len) {
         fprintf(stderr, "%s write error\n", argv[2] ? argv[2] : "stdout");

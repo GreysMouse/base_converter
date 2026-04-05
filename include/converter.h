@@ -1,1 +1,1 @@
-long convert(char *src, char *dest);
+long convert(char *src, long src_len);
