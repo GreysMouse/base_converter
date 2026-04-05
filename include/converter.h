@@ -1,0 +1,1 @@
+long convert(char *src, char *dest);
