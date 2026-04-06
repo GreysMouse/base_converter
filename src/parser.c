@@ -1,6 +1,5 @@
+#include "../include/parser.h"
 #include <stdio.h>
-
-static int get_digit(char c);
 
 long parse(const char *src, long src_len, int *src_base, int *dest_base)
 {
@@ -72,7 +71,7 @@ long parse(const char *src, long src_len, int *src_base, int *dest_base)
     return num_len;
 }
 
-static int get_digit(char c)
+int get_digit(char c)
 {
     if (c >= '0' && c <= '9') {
         return c - '0';

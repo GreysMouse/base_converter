@@ -5,4 +5,6 @@
  * Write values to src_base and dest_base. */
 long parse(const char *src, long src_len, int *src_base, int *dest_base);
 
+int get_digit(char c);
+
 #endif

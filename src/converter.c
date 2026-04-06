@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-long convert(char *src, long src_len)
+long convert(const char *src, long src_len)
 {
     int src_base, dest_base, num_len;
 
