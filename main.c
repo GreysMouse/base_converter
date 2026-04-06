@@ -51,7 +51,7 @@ int main(int argc, const char **argv)
     };
 
     res = buf + src_len;
-    res_len = convert(buf, src_len);
+    res_len = convert(buf, src_len, res);
 
     if (res_len < 0) {
         goto cleanup;
