@@ -6,8 +6,8 @@
 static const char DIGITS[] =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-static int is_digit(char c, size_t base);
-static long parse(char *src, long src_len, int *src_base, int *dest_base);
+static int get_digit(char c);
+static long parse(const char *src, long src_len, int *src_base, int *dest_base);
 
 long convert(char *src, long src_len)
 {
@@ -21,93 +21,71 @@ long convert(char *src, long src_len)
     return num_len;
 }
 
-static int is_digit(char c, size_t base)
+static int get_digit(char c)
 {
-    return c >= DIGITS[0] && c <= DIGITS[base - 1];
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    } else if (c >= 'a' && c <= 'z') {
+        return c - 'a' + 10;
+    } else if (c >= 'A' && c <= 'Z') {
+        return c - 'A' + 36;
+    } else {
+        return -1;
+    }
 }
 
-static long parse(char *src, long src_len, int *src_base, int *dest_base)
+static long parse(const char *src, long src_len, int *src_base, int *dest_base)
 {
-    int p = 1, err = 0;
-    int stage = 2; /* 0 - num, 1 - src base, 2 - dest base */
-    long i, len = 0;
+    int digit, max_digit = 0;
+    long i, num_len = 0, src_base_len = 0, dest_base_len = 0;
 
-    *src_base = -1;
-    *dest_base = -1;
-
-    for (i = src_len - 1; i >= 0; i--) {
+    for (i = 0; i < src_len; i++) {
         if (src[i] == ' ') {
-            if (stage == 2) {
-                if (*dest_base == -1) {
-                    err = 1;
-                    break;
-                }
-                if (*dest_base < 2 || *dest_base > sizeof(DIGITS)) {
-                    err = 2;
-                    break;
-                }
-            }
-            if (stage == 1) {
-                if (*src_base == -1) {
-                    err = 1;
-                    break;
-                }
-                if (*src_base < 2 || *src_base > sizeof(DIGITS)) {
-                    err = 3;
-                    break;
-                }
-            }
-            if (stage == 0) {
-                err = 1;
-                break;
-            }
-            if (err) {
-                break;
-            }
-            stage--;
-            p = 1;
-            len = i;
+            break;
+        }
+        digit = get_digit(src[i]);
 
-            continue;
+        if (digit == -1) {
+            fprintf(stderr, "Base of provided number exceeds 62");
+            return -1;
         }
-        if (stage == 0) {
-            if (!is_digit(src[i], *src_base)) {
-                err = 2;
-            }
-            continue;
+        if (digit > max_digit) {
+            max_digit = digit;
         }
-        if (stage == 1) {
-            if (!is_digit(src[i], 10)) {
-                err = 3;
-            }
-            *src_base += (src[i] - '0') * p;
-            p *= 10;
-            continue;
+        num_len++;
+    }
+    for (; i < src_len; i++) {
+        if (src[i] == ' ') {
+            break;
         }
-        if (stage == 2) {
-            if (!is_digit(src[i], 10)) {
-                err = 4;
-            }
-            *dest_base += (src[i] - '0') * p;
-            p *= 10;
+        digit = get_digit(src[i]);
+
+        if (digit > 9) {
+            fprintf(stderr, "The source base should be decimal\n");
+            return -1;
         }
+        *src_base = *src_base * 10 + digit;
+        src_base_len++;
+    }
+    for (; i < src_len; i++) {
+        digit = get_digit(src[i]);
+
+        if (digit > 9) {
+            fprintf(stderr, "The target base should be decimal\n");
+            return -1;
+        }
+        *dest_base = *dest_base * 10 + digit;
+        dest_base_len++;
     }
 
-    if (!src_len || err == 1) {
-        fprintf(stderr,
-                "Invalid source foramat: \"<num> <from-base> <to-base>\"\n");
-    } else if (err == 2) {
-        fprintf(stderr, "The target base should be between 2 and %ld\n",
-                sizeof(DIGITS));
-    } else if (err == 3) {
-        fprintf(stderr, "The source base should be between 2 and %ld\n",
-                sizeof(DIGITS));
-    } else if (err == 2) {
-        fprintf(stderr, "The number provided is not in a base %d\n", *src_base);
-    } else if (err == 3) {
-        fprintf(stderr, "The source base should be decimal\n");
-    } else if (err == 4) {
-        fprintf(stderr, "The target base should be decimal\n");
+    if (!num_len || !src_base_len || !dest_base_len) {
+        fprintf(
+            stderr,
+            "Invalid source foramat: \"<num> <source base> <target base>\"\n");
+        return -1;
     }
-    return -err || len;
+    if (max_digit >= *src_base) {
+        fprintf(stderr, "The source number is not in a base %d\n", *src_base);
+        return -1;
+    }
 }
