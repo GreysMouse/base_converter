@@ -8,7 +8,7 @@ int main(int argc, const char **argv)
     FILE *src, *dest = stdout;
     char *buf, *res;
     int ret = EXIT_FAILURE;
-    long src_len, res_len;
+    long src_len, res_len, res_offset;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <src file> [<dest file>]\n", argv[0]);
@@ -38,7 +38,7 @@ int main(int argc, const char **argv)
         goto cleanup;
     }
 
-    buf = malloc(sizeof(char) * (2 * src_len + 1));
+    buf = malloc(sizeof(char) * 2 * src_len);
 
     if (!buf) {
         perror(argv[0]);
@@ -51,17 +51,21 @@ int main(int argc, const char **argv)
     };
 
     res = buf + src_len;
-    res_len = convert(buf, src_len, res);
+    res_len = convert(buf, src_len, res, src_len);
 
     if (res_len < 0) {
         goto cleanup;
     }
 
-    if (fwrite(res, sizeof(char), res_len, dest) != res_len) {
+    res_offset = src_len - res_len;
+
+    if (fwrite(res + res_offset, sizeof(char), res_len, dest) != res_len) {
         fprintf(stderr, "%s write error\n", argv[2] ? argv[2] : "stdout");
         goto cleanup;
     };
-
+    if (dest == stdout) {
+        fputc('\n', dest);
+    }
     ret = EXIT_SUCCESS;
 
 cleanup:

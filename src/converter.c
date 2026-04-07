@@ -4,35 +4,42 @@
 #include <stdio.h>
 #include <string.h>
 
-long convert(char *src, long src_len, char *dest)
+long convert(char *src, long src_len, char *dest, long dest_len)
 {
-    int src_base, dest_base, num_len;
+    int src_base, dest_base;
+    long acc_len, dest_offset = dest_len;
 
-    num_len = parse(src, src_len, &src_base, &dest_base);
+    acc_len = parse(src, src_len, &src_base, &dest_base);
 
-    if (num_len < 0) {
-        return num_len;
+    if (acc_len < 0) {
+        return -1;
     }
 
-    /* After parsing it is guaranteed that only digit chars would be handled */
-    while (src[0]) {
-        int len = 0, num = 0, digit;
+    /* After parsing, it is guaranteed that only numeric characters will be
+     * processed. */
 
-        for (int i = 0; i < num_len; i++) {
-            digit = get_digit(src[i]);
+    while (acc_len) {
+        int quot, quot_len = 0, acc = 0;
 
-            num = num * src_base + digit;
+        for (int i = 0; i < acc_len; i++) {
+            acc = acc * src_base + get_digit(src[i]);
 
-            if (num < dest_base) {
+            if (acc < dest_base && i < acc_len - 1) {
                 continue;
             }
-            src[len] = num / dest_base; /* TODO: convert to src_base char */
-            num %= dest_base;
-            len++;
+            quot = acc / dest_base;
+
+            src[quot_len] = get_digit_char(quot);
+            acc %= dest_base;
+
+            if (quot > 0) {
+                quot_len++;
+            }
         }
-        *dest = num; /* TODO: convert to char */
-        dest++;
-        num_len = len;
+        acc_len = quot_len;
+
+        dest[dest_offset - 1] = get_digit_char(acc);
+        dest_offset--;
     }
-    return num_len;
+    return dest_len - dest_offset;
 }

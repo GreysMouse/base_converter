@@ -6,5 +6,6 @@
 long parse(const char *src, long src_len, int *src_base, int *dest_base);
 
 int get_digit(char c);
+char get_digit_char(int d);
 
 #endif

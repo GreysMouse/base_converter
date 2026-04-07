@@ -84,3 +84,17 @@ int get_digit(char c)
     }
     return -1;
 }
+
+char get_digit_char(int d)
+{
+    if (d >= 0 && d < 10) {
+        return d + '0';
+    }
+    if (d >= 10 && d < 36) {
+        return d + 'a';
+    }
+    if (d >= 36 && d < 62) {
+        return d + 'A';
+    }
+    return -1;
+}
