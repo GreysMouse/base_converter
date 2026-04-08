@@ -18,7 +18,7 @@ long convert(char *src, long src_len, char *dest, long dest_len)
     /* After parsing, it is guaranteed that only numeric characters will be
      * processed. */
 
-    while (acc_len) {
+    while (1) {
         int quot, quot_len = 0, acc = 0;
 
         for (int i = 0; i < acc_len; i++) {
@@ -31,15 +31,17 @@ long convert(char *src, long src_len, char *dest, long dest_len)
 
             src[quot_len] = get_digit_char(quot);
             acc %= dest_base;
-
-            if (quot > 0) {
-                quot_len++;
-            }
+            quot_len++;
         }
+        src_base = 10;
         acc_len = quot_len;
 
         dest[dest_offset - 1] = get_digit_char(acc);
         dest_offset--;
+
+        if (!quot && acc_len == 1) {
+            break;
+        }
     }
     return dest_len - dest_offset;
 }
