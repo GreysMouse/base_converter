@@ -91,10 +91,10 @@ char get_digit_char(int d)
         return d + '0';
     }
     if (d >= 10 && d < 36) {
-        return d + 'a';
+        return d + 'a' - 10;
     }
     if (d >= 36 && d < 62) {
-        return d + 'A';
+        return d + 'A' - 36;
     }
     return -1;
 }
