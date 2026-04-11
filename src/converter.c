@@ -1,34 +1,49 @@
 #include "../include/converter.h"
 #include "../include/parser.h"
-#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int divide(char *num, long *num_len, int num_base, int divider);
+static long get_result_len(long num_len, int from_base, int to_base);
 
-long convert(char *src, long src_len, char *dest, long dest_len)
+/* Description in "converter.h" */
+char *convert(char *num, long num_len, int from_base, int to_base)
 {
-    int src_base, dest_base, rest;
-    long num_len, dest_offset;
+    int rest;
+    long res_len, res_offset;
+    char *res;
 
-    num_len = parse(src, src_len, &src_base, &dest_base);
+    res_len = get_result_len(num_len, from_base, to_base);
 
-    if (num_len < 0) {
-        return -1;
+    printf("len: %ld\n", res_len);
+
+    res = malloc(sizeof(char) * (res_len + 1)); /* one extra char for '\0' */
+
+    if (!res) {
+        return NULL;
     }
 
-    /* TODO: if src_base == dest_base just copy src to dest */
-
-    /* After parsing, it is guaranteed that only numeric characters will be
-     * processed. */
-
-    while (*src != '0') {
-        rest = divide(src, &num_len, src_base, dest_base);
-
-        dest[dest_offset - 1] = get_digit_char(rest);
-        dest_offset--;
+    if (from_base == to_base) {
+        num[num_len] = '\0';
+        return num;
     }
-    return dest_len - dest_offset;
+
+    res_offset = res_len - 1;
+
+    while (*num != '0') {
+        rest = divide(num, &num_len, from_base, to_base);
+
+        res[res_offset] = get_digit_char(rest);
+        res_offset--;
+    }
+    while (res_offset >= 0) {
+        res[res_offset] = '0';
+        res_offset--;
+    }
+    res[res_len] = '\0';
+
+    return res;
 }
 
 /* Params:
@@ -60,4 +75,33 @@ static int divide(char *num, long *num_len, int num_base, int divider)
     *num_len = subnum_len;
 
     return subnum;
+}
+
+/* Params:
+ * num_len - count of digits of some number;
+ * from_base - in decimal notation;
+ * to_base - in decimal notation.
+ *
+ * Returns count of digits of number after possible convertation from from_base
+ * to to_base.
+ */
+static long get_result_len(long num_len, int from_base, int to_base)
+{
+    int pow;
+
+    if (from_base < to_base) {
+        for (pow = 1; from_base > 0; pow++) {
+            from_base /= to_base;
+        };
+        printf("pow: %d\n", pow);
+        return num_len / pow;
+    }
+    if (from_base > to_base) {
+        for (pow = 1; to_base >= 0; pow++) {
+            to_base /= from_base;
+        };
+        printf("pow: %d\n", pow);
+        return num_len * pow;
+    }
+    return num_len;
 }

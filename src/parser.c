@@ -1,16 +1,17 @@
 #include "../include/parser.h"
 #include <stdio.h>
 
-long parse(const char *src, long src_len, int *src_base, int *dest_base)
+/* Description in "parser.h" */
+long parse(const char *input, long input_len, int *from_base, int *to_base)
 {
-    int src_base_loc = 0, dest_base_loc = 0, digit, max_digit = 0;
-    long i, num_len = 0, src_base_len = 0, dest_base_len = 0;
+    int from_base_loc = 0, to_base_loc = 0, digit, max_digit = 0;
+    long i, num_len = 0, from_base_len = 0, to_base_len = 0;
 
-    for (i = 0; i < src_len; i++) {
-        if (src[i] == ' ') {
+    for (i = 0; i < input_len; i++) {
+        if (input[i] == ' ') {
             break;
         }
-        digit = get_digit(src[i]);
+        digit = get_digit(input[i]);
 
         if (digit == -1) {
             fprintf(stderr, "Base of provided number exceeds 62\n");
@@ -21,52 +22,52 @@ long parse(const char *src, long src_len, int *src_base, int *dest_base)
         }
         num_len++;
     }
-    for (++i; i < src_len; i++) {
-        if (src[i] == ' ') {
+    for (++i; i < input_len; i++) {
+        if (input[i] == ' ') {
             break;
         }
-        digit = get_digit(src[i]);
+        digit = get_digit(input[i]);
 
         if (digit > 9) {
             fprintf(stderr, "The source base should be decimal\n");
             return -1;
         }
-        src_base_loc = src_base_loc * 10 + digit;
-        src_base_len++;
+        from_base_loc = from_base_loc * 10 + digit;
+        from_base_len++;
     }
-    for (++i; i < src_len; i++) {
-        if (src[i] == ' ') {
+    for (++i; i < input_len; i++) {
+        if (input[i] == ' ') {
             break;
         }
-        digit = get_digit(src[i]);
+        digit = get_digit(input[i]);
 
         if (digit > 9) {
             fprintf(stderr, "The target base should be decimal\n");
             return -1;
         }
-        dest_base_loc = dest_base_loc * 10 + digit;
-        dest_base_len++;
+        to_base_loc = to_base_loc * 10 + digit;
+        to_base_len++;
     }
-    if (!num_len || !src_base_len || !dest_base_len) {
+    if (!num_len || !from_base_len || !to_base_len) {
         fprintf(stderr,
                 "Invalid format: \"<num> <source base> <target base>\"\n");
         return -1;
     }
-    if (src_base_loc < 2 || src_base_loc > 62) {
+    if (from_base_loc < 2 || from_base_loc > 62) {
         fprintf(stderr, "The source base should be between 2 and 62\n");
         return -1;
     }
-    if (dest_base_loc < 2 || dest_base_loc > 62) {
+    if (to_base_loc < 2 || to_base_loc > 62) {
         fprintf(stderr, "The target base should be between 2 and 62\n");
         return -1;
     }
-    if (max_digit >= src_base_loc) {
+    if (max_digit >= from_base_loc) {
         fprintf(stderr, "The source number is not in a base %d\n",
-                src_base_loc);
+                from_base_loc);
         return -1;
     }
-    *src_base = src_base_loc;
-    *dest_base = dest_base_loc;
+    *from_base = from_base_loc;
+    *to_base = to_base_loc;
 
     return num_len;
 }
