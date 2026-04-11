@@ -66,6 +66,12 @@ int main(int argc, const char **argv)
         goto cleanup;
     }
 
+#if SKIP_LEADING_ZEROS
+    while (*res == '0') {
+        res++;
+    }
+#endif
+
     if (fputs(res, dest) == EOF) {
         fprintf(stderr, "%s write error\n", argv[2] ? argv[2] : "stdout");
         goto cleanup;

@@ -7,26 +7,23 @@
 static int divide(char *num, long *num_len, int num_base, int divider);
 static long get_result_len(long num_len, int from_base, int to_base);
 
-/* Description in "converter.h" */
+/* Description is in the "converter.h" */
 char *convert(char *num, long num_len, int from_base, int to_base)
 {
     int rest;
     long res_len, res_offset;
     char *res;
 
-    res_len = get_result_len(num_len, from_base, to_base);
-
-    printf("len: %ld\n", res_len);
-
-    res = malloc(sizeof(char) * (res_len + 1)); /* one extra char for '\0' */
-
-    if (!res) {
-        return NULL;
-    }
-
     if (from_base == to_base) {
         num[num_len] = '\0';
         return num;
+    }
+
+    res_len = get_result_len(num_len, from_base, to_base);
+    res = malloc(sizeof(char) * (res_len + 1));
+
+    if (!res) {
+        return NULL;
     }
 
     res_offset = res_len - 1;
@@ -82,26 +79,26 @@ static int divide(char *num, long *num_len, int num_base, int divider)
  * from_base - in decimal notation;
  * to_base - in decimal notation.
  *
- * Returns count of digits of number after possible convertation from from_base
- * to to_base.
+ * Returns approximate count of digits of number after possible convertation
+ * from from_base to to_base.
  */
 static long get_result_len(long num_len, int from_base, int to_base)
 {
-    int pow;
+    int pow, rest;
 
     if (from_base < to_base) {
-        for (pow = 1; from_base > 0; pow++) {
-            from_base /= to_base;
-        };
-        printf("pow: %d\n", pow);
-        return num_len / pow;
-    }
-    if (from_base > to_base) {
-        for (pow = 1; to_base >= 0; pow++) {
+        for (pow = 1; from_base < to_base; pow++) {
+            rest = from_base % to_base;
             to_base /= from_base;
         };
-        printf("pow: %d\n", pow);
-        return num_len * pow;
+        return num_len / (pow - (rest > 0 ? 1 : 0));
+    }
+    if (from_base > to_base) {
+        for (pow = 1; from_base > to_base; pow++) {
+            rest = from_base % to_base;
+            from_base /= to_base;
+        };
+        return num_len * (pow + (rest > 0 ? 1 : 0));
     }
     return num_len;
 }

@@ -1,7 +1,7 @@
 #include "../include/parser.h"
 #include <stdio.h>
 
-/* Description in "parser.h" */
+/* Description is in the "parser.h" */
 long parse(const char *input, long input_len, int *from_base, int *to_base)
 {
     int from_base_loc = 0, to_base_loc = 0, digit, max_digit = 0;

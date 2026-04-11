@@ -7,8 +7,10 @@
  * from_base - in decimal notation;
  * to_base - in decimal notation.
  *
- * Returns chars d(or digits) count of provided number. Writes values to
+ * Returns chars (or digits) count of provided number. Writes values to
  * from_base and to_base.
+ * Returns -1 with an error message printed to stderr if input data validation
+ * fails.
  */
 long parse(const char *input, long input_len, int *from_base, int *to_base);
 
