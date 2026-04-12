@@ -1,4 +1,4 @@
-#include "../include/stream.h"
+#include "stream.h"
 #include <stdio.h>
 #include <stdlib.h>
 

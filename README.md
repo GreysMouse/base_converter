@@ -19,8 +19,12 @@ where \<numeric chars> are consecutive characters representing the digits of a g
 
 Source base and target base should be specified as decimals with a value between 2 and 62.
 
-Program can be compiled with macro symbol
+By default the program compiled with macro symbol
 
     SKIP_LEADING_ZEROS=1
     
-which skip insignificant leading zeros of result that can arise during convertation.
+which forces the program to skip insignificant leading zeros of result that can arise during convertation. To override this behavior use
+
+    make CPPFLAGS=
+
+for compilation.

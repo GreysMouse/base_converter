@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 #include <stdio.h>
 
 /* Description is in the "parser.h" */

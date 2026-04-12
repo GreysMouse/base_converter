@@ -1,6 +1,6 @@
-#include "include/converter.h"
-#include "include/parser.h"
-#include "include/stream.h"
+#include "converter.h"
+#include "parser.h"
+#include "stream.h"
 #include <stdio.h>
 #include <stdlib.h>
 
