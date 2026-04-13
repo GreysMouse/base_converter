@@ -1,6 +1,6 @@
 About: 
 
-A program for converting a string representation of a number in a specified positional notation to a string representation of a number in another specified one. Length of input number in unlimited. The base of the number system is limited to the range from 2 to 62.
+A program for converting a string representation of a positive integer number in a specified positional notation to a string representation of a number in another specified one. Length of input number in unlimited. The base of the number system is limited to the range from 2 to 62.
 
 Usage:
 
