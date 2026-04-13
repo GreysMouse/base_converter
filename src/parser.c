@@ -1,6 +1,10 @@
 #include "parser.h"
 #include <stdio.h>
 
+#define DELIMITER ' '
+
+static int is_whitespace(char c);
+
 /* Description is in the "parser.h" */
 long parse(const char *input, long input_len, int *from_base, int *to_base)
 {
@@ -8,10 +12,17 @@ long parse(const char *input, long input_len, int *from_base, int *to_base)
     long i, num_len = 0, from_base_len = 0, to_base_len = 0;
 
     for (i = 0; i < input_len; i++) {
-        if (input[i] == ' ') {
+        char c = input[i];
+
+        if (c == DELIMITER) {
             break;
         }
-        digit = get_digit(input[i]);
+        if (is_whitespace(c)) {
+            fprintf(stderr,
+                    "Invalid format: \"<num> <source base> <target base>\"\n");
+            return -1;
+        }
+        digit = get_digit(c);
 
         if (digit == -1) {
             fprintf(stderr, "Base of provided number exceeds 62\n");
@@ -23,12 +34,19 @@ long parse(const char *input, long input_len, int *from_base, int *to_base)
         num_len++;
     }
     for (++i; i < input_len; i++) {
-        if (input[i] == ' ') {
+        char c = input[i];
+
+        if (c == DELIMITER) {
             break;
         }
-        digit = get_digit(input[i]);
+        if (is_whitespace(c)) {
+            fprintf(stderr,
+                    "Invalid format: \"<num> <source base> <target base>\"\n");
+            return -1;
+        }
+        digit = get_digit(c);
 
-        if (digit > 9) {
+        if (digit == -1 || digit > 9) {
             fprintf(stderr, "The source base should be decimal\n");
             return -1;
         }
@@ -36,12 +54,14 @@ long parse(const char *input, long input_len, int *from_base, int *to_base)
         from_base_len++;
     }
     for (++i; i < input_len; i++) {
-        if (input[i] == ' ') {
+        char c = input[i];
+
+        if (c == DELIMITER || is_whitespace(c)) {
             break;
         }
-        digit = get_digit(input[i]);
+        digit = get_digit(c);
 
-        if (digit > 9) {
+        if (digit == -1 || digit > 9) {
             fprintf(stderr, "The target base should be decimal\n");
             return -1;
         }
@@ -98,4 +118,21 @@ char get_digit_char(int d)
         return d + 'A' - 36;
     }
     return -1;
+}
+
+static int is_whitespace(char c)
+{
+#if DELIMITER == ' '
+    return c == '\n' || c == '\r' || c == '\t' || c == '\v';
+#elif DELIMITER == '\n'
+    return c == ' ' || c == '\r' || c == '\t' || c == '\v';
+#elif DELIMITER == '\r'
+    return c == ' ' || c == '\n' || c == '\t' || c == '\v';
+#elif DELIMITER == '\t'
+    return c == ' ' || c == '\n' || c == '\r' || c == '\v';
+#elif DELIMITER == '\v'
+    return c == ' ' || c == '\n' || c == '\r' || c == '\t';
+#else
+    return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\v';
+#endif
 }
