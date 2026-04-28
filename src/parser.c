@@ -2,8 +2,7 @@
 #include <stdio.h>
 
 #define DELIMITER ' '
-
-static int is_whitespace(char c);
+#define WHITESPACE(C) ((C) == '\n' || (C) == '\t' || (C) == '\v')
 
 /* Description is in the "parser.h" */
 long parse(const char *input, long input_len, int *from_base, int *to_base)
@@ -17,7 +16,7 @@ long parse(const char *input, long input_len, int *from_base, int *to_base)
         if (c == DELIMITER) {
             break;
         }
-        if (is_whitespace(c)) {
+        if (WHITESPACE(c)) {
             fprintf(stderr,
                     "Invalid format: \"<num> <source base> <target base>\"\n");
             return -1;
@@ -39,7 +38,7 @@ long parse(const char *input, long input_len, int *from_base, int *to_base)
         if (c == DELIMITER) {
             break;
         }
-        if (is_whitespace(c)) {
+        if (WHITESPACE(c)) {
             fprintf(stderr,
                     "Invalid format: \"<num> <source base> <target base>\"\n");
             return -1;
@@ -56,7 +55,7 @@ long parse(const char *input, long input_len, int *from_base, int *to_base)
     for (++i; i < input_len; i++) {
         char c = input[i];
 
-        if (c == DELIMITER || is_whitespace(c)) {
+        if (c == DELIMITER || WHITESPACE(c)) {
             break;
         }
         digit = get_digit(c);
@@ -118,21 +117,4 @@ char get_digit_char(int d)
         return d + 'A' - 36;
     }
     return -1;
-}
-
-static int is_whitespace(char c)
-{
-#if DELIMITER == ' '
-    return c == '\n' || c == '\r' || c == '\t' || c == '\v';
-#elif DELIMITER == '\n'
-    return c == ' ' || c == '\r' || c == '\t' || c == '\v';
-#elif DELIMITER == '\r'
-    return c == ' ' || c == '\n' || c == '\t' || c == '\v';
-#elif DELIMITER == '\t'
-    return c == ' ' || c == '\n' || c == '\r' || c == '\v';
-#elif DELIMITER == '\v'
-    return c == ' ' || c == '\n' || c == '\r' || c == '\t';
-#else
-    return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\v';
-#endif
 }
